@@ -2,6 +2,14 @@
 
 A comprehensive microservice built with NestJS and MongoDB Atlas for managing school payments and transactions.
 
+## 🚀 Live Demo
+
+**Production URL**: [https://school-payment-api-4.onrender.com](https://school-payment-api-4.onrender.com)
+
+**API Status**: ✅ Online and Running
+
+**Health Check**: [https://school-payment-api-4.onrender.com/health](https://school-payment-api-4.onrender.com/health)
+
 ## Features
 
 - 🔐 JWT Authentication & Authorization
@@ -14,12 +22,13 @@ A comprehensive microservice built with NestJS and MongoDB Atlas for managing sc
 
 ## Tech Stack
 
-- **Framework**: NestJS (JavaScript)
+- **Framework**: NestJS (TypeScript)
 - **Database**: MongoDB Atlas
 - **Authentication**: JWT
 - **Validation**: class-validator, class-transformer
 - **HTTP Client**: Axios
 - **Package Manager**: pnpm
+- **Deployment**: Render
 
 ## Prerequisites
 
@@ -311,7 +320,8 @@ Content-Type: application/json
 
 1. Import the provided Postman collection
 2. Set up environment variables in Postman:
-   - `base_url`: http://localhost:3000
+   - `base_url`: https://school-payment-api-4.onrender.com (Production)
+   - `base_url_local`: http://localhost:3000 (Local Development)
    - `jwt_token`: (obtained from login)
 
 3. Test the following flow:
@@ -320,6 +330,21 @@ Content-Type: application/json
    - Create a payment
    - Check transaction status
    - Simulate webhook call
+
+### Quick Test Commands
+
+```bash
+# Health Check
+curl https://school-payment-api-4.onrender.com/health
+
+# API Info
+curl https://school-payment-api-4.onrender.com/
+
+# Register User
+curl -X POST https://school-payment-api-4.onrender.com/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"password123","role":"school_admin","school_id":"65b0e6293e9f76a9694d84b4"}'
+```
 
 ## Error Handling
 
@@ -340,11 +365,40 @@ The API provides comprehensive error handling with:
 
 ## Deployment
 
-1. Set up MongoDB Atlas cluster
-2. Configure environment variables
-3. Deploy to your preferred platform (Heroku, AWS, etc.)
-4. Set up webhook URLs in payment gateway
-5. Configure CORS for production domains
+### Production Deployment (Render)
+
+✅ **Successfully Deployed**: [https://school-payment-api-4.onrender.com](https://school-payment-api-4.onrender.com)
+
+**Deployment Steps:**
+
+1. ✅ Set up MongoDB Atlas cluster
+2. ✅ Configure environment variables in Render
+3. ✅ Deploy to Render platform
+4. ✅ Set up webhook URLs in payment gateway
+5. ✅ Configure CORS for production domains
+
+**Environment Variables Set:**
+
+- `MONGODB_URI`: MongoDB Atlas connection string
+- `JWT_SECRET`: Secure JWT signing key
+- `JWT_EXPIRES_IN`: Token expiration time
+- `PG_KEY`: Payment gateway key
+- `API_KEY`: Payment API key
+- `SCHOOL_ID`: School identifier
+- `PAYMENT_API_URL`: Payment gateway URL
+
+### Local Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env
+
+# Start development server
+pnpm start:dev
+```
 
 ## Contributing
 
