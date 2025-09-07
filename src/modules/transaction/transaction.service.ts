@@ -11,12 +11,37 @@ export class TransactionService {
     @InjectModel(OrderStatus.name) private orderStatusModel: Model<OrderStatusDocument>
   ) {}
 
-  async getAllTransactions(page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[]) {
+  async getAllTransactions(page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[], dateFrom?: string, dateTo?: string, search?: string) {
     try {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
 
+      // Build date filter
+      const dateFilter: any = {};
+      if (dateFrom || dateTo) {
+        const paymentTimeFilter: any = { $exists: true, $ne: null };
+        
+        if (dateFrom) {
+          const startDate = new Date(dateFrom);
+          startDate.setHours(0, 0, 0, 0);
+          paymentTimeFilter.$gte = startDate;
+        }
+        if (dateTo) {
+          const endDate = new Date(dateTo);
+          endDate.setHours(23, 59, 59, 999);
+          paymentTimeFilter.$lte = endDate;
+        }
+        
+        dateFilter['orderStatus.payment_time'] = paymentTimeFilter;
+      }
+
       const pipeline: any[] = [
+        // Add search filter at the beginning if search is provided
+        ...(search ? [{
+          $match: {
+            school_id: { $regex: search, $options: 'i' }
+          }
+        }] : []),
         {
           $lookup: {
             from: 'orderstatuses',
@@ -35,6 +60,9 @@ export class TransactionService {
           $match: {
             'orderStatus.status': Array.isArray(status) ? { $in: status } : status
           }
+        }] : []),
+        ...(Object.keys(dateFilter).length > 0 ? [{
+          $match: dateFilter
         }] : []),
         {
           $project: {
@@ -86,14 +114,36 @@ export class TransactionService {
     }
   }
 
-  async getTransactionsBySchool(schoolId: string, page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[]) {
+  async getTransactionsBySchool(schoolId: string, page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[], dateFrom?: string, dateTo?: string, search?: string) {
     try {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
 
+      // Build date filter
+      const dateFilter: any = {};
+      if (dateFrom || dateTo) {
+        const paymentTimeFilter: any = { $exists: true, $ne: null };
+        
+        if (dateFrom) {
+          const startDate = new Date(dateFrom);
+          startDate.setHours(0, 0, 0, 0);
+          paymentTimeFilter.$gte = startDate;
+        }
+        if (dateTo) {
+          const endDate = new Date(dateTo);
+          endDate.setHours(23, 59, 59, 999);
+          paymentTimeFilter.$lte = endDate;
+        }
+        
+        dateFilter['orderStatus.payment_time'] = paymentTimeFilter;
+      }
+
       const pipeline: any[] = [
         {
-          $match: { school_id: schoolId }
+          $match: { 
+            school_id: schoolId,
+            ...(search ? { school_id: { $regex: search, $options: 'i' } } : {})
+          }
         },
         {
           $lookup: {
@@ -113,6 +163,9 @@ export class TransactionService {
           $match: {
             'orderStatus.status': Array.isArray(status) ? { $in: status } : status
           }
+        }] : []),
+        ...(Object.keys(dateFilter).length > 0 ? [{
+          $match: dateFilter
         }] : []),
         {
           $project: {

@@ -13,14 +13,20 @@ export class TransactionController {
     @Query('limit') limit: string = '10',
     @Query('sortBy') sortBy: string = 'payment_time',
     @Query('sortOrder') sortOrder: string = 'desc',
-    @Query('status') status?: string | string[]
+    @Query('status') status?: string | string[],
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+    @Query('search') search?: string
   ) {
     return await this.transactionService.getAllTransactions(
       parseInt(page),
       parseInt(limit),
       sortBy,
       sortOrder,
-      status
+      status,
+      dateFrom,
+      dateTo,
+      search
     );
   }
 
@@ -31,7 +37,10 @@ export class TransactionController {
     @Query('limit') limit: string = '10',
     @Query('sortBy') sortBy: string = 'payment_time',
     @Query('sortOrder') sortOrder: string = 'desc',
-    @Query('status') status?: string | string[]
+    @Query('status') status?: string | string[],
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+    @Query('search') search?: string
   ) {
     return await this.transactionService.getTransactionsBySchool(
       schoolId,
@@ -39,7 +48,10 @@ export class TransactionController {
       parseInt(limit),
       sortBy,
       sortOrder,
-      status
+      status,
+      dateFrom,
+      dateTo,
+      search
     );
   }
 
