@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CreatePaymentDto } from '../../dto/create-payment.dto';
@@ -16,5 +16,10 @@ export class PaymentController {
   @Get('status/:customOrderId')
   async getPaymentStatus(@Param('customOrderId') customOrderId: string) {
     return await this.paymentService.getPaymentStatus(customOrderId);
+  }
+
+  @Get('callback')
+  async paymentCallback(@Query() query: any) {
+    return await this.paymentService.handlePaymentCallback(query);
   }
 }

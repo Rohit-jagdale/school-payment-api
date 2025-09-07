@@ -47,28 +47,40 @@ export class PaymentService {
 
       await orderStatus.save();
 
-      // Prepare payment gateway payload
-      const paymentPayload = {
-        pg_key: this.configService.get('PG_KEY'),
-        school_id: this.configService.get('SCHOOL_ID'),
-        order_id: customOrderId,
-        order_amount: createPaymentDto.order_amount,
-        student_info: createPaymentDto.student_info,
-        gateway_name: createPaymentDto.gateway_name
+      // Prepare Edviron API payload according to documentation
+      const callbackUrl = `${this.configService.get('BASE_URL') || 'http://localhost:3000'}/payment/callback`;
+      
+      const jwtPayload = {
+        school_id: createPaymentDto.school_id,
+        amount: createPaymentDto.order_amount.toString(),
+        callback_url: callbackUrl
       };
 
-      // Generate JWT token for payment API
-      const jwtToken = jwt.sign(paymentPayload, this.configService.get('API_KEY'), {
+      // Generate JWT token using PG secret key for signing
+      const sign = jwt.sign(jwtPayload, this.configService.get('PG_KEY'), {
         expiresIn: '1h'
       });
 
-      // Call payment gateway API
-      const paymentResponse = await this.callPaymentGateway(jwtToken, paymentPayload);
+      const paymentPayload = {
+        school_id: createPaymentDto.school_id,
+        amount: createPaymentDto.order_amount.toString(),
+        callback_url: callbackUrl,
+        sign: sign
+      };
+
+      // Call Edviron payment gateway API
+      const paymentResponse = await this.callPaymentGateway(paymentPayload);
+
+      // Update order with collect_request_id
+      await this.orderModel.findByIdAndUpdate(savedOrder._id, {
+        collect_request_id: paymentResponse.collect_request_id
+      });
 
       return {
         success: true,
         order_id: customOrderId,
-        payment_url: paymentResponse.payment_url,
+        collect_request_id: paymentResponse.collect_request_id,
+        payment_url: paymentResponse.collect_request_url || `https://dev-vanilla.edviron.com/payment/${paymentResponse.collect_request_id}`,
         message: 'Payment initiated successfully'
       };
 
@@ -77,14 +89,14 @@ export class PaymentService {
     }
   }
 
-  async callPaymentGateway(jwtToken: string, payload: any) {
+  async callPaymentGateway(payload: any) {
     try {
       const response = await axios.post(
-        `${this.configService.get('PAYMENT_API_URL')}/create-collect-request`,
+        'https://dev-vanilla.edviron.com/erp/create-collect-request',
         payload,
         {
           headers: {
-            'Authorization': `Bearer ${jwtToken}`,
+            'Authorization': `Bearer ${this.configService.get('API_KEY')}`,
             'Content-Type': 'application/json'
           }
         }
@@ -103,6 +115,46 @@ export class PaymentService {
         throw new BadRequestException('Order not found');
       }
 
+      // If we have a collect_request_id, check status with Edviron API
+      if (order.collect_request_id) {
+        const jwtPayload = {
+          school_id: order.school_id.toString(),
+          collect_request_id: order.collect_request_id
+        };
+
+        const sign = jwt.sign(jwtPayload, this.configService.get('PG_KEY'), {
+          expiresIn: '1h'
+        });
+
+        const statusResponse = await this.checkPaymentStatusWithGateway(
+          order.collect_request_id,
+          order.school_id.toString(),
+          sign
+        );
+
+        // Update local order status based on gateway response
+        if (statusResponse.status === 'SUCCESS') {
+          await this.orderStatusModel.findOneAndUpdate(
+            { collect_id: order._id },
+            {
+              status: 'completed',
+              payment_details: 'Payment completed successfully',
+              payment_time: new Date()
+            }
+          );
+        }
+
+        return {
+          order_id: customOrderId,
+          collect_request_id: order.collect_request_id,
+          status: statusResponse.status,
+          amount: statusResponse.amount,
+          details: statusResponse.details,
+          jwt: statusResponse.jwt
+        };
+      }
+
+      // Fallback to local status if no collect_request_id
       const orderStatus = await this.orderStatusModel.findOne({ collect_id: order._id });
       
       return {
@@ -113,6 +165,45 @@ export class PaymentService {
       };
     } catch (error) {
       throw new BadRequestException(`Failed to get payment status: ${error.message}`);
+    }
+  }
+
+  async checkPaymentStatusWithGateway(collectRequestId: string, schoolId: string, sign: string) {
+    try {
+      const response = await axios.get(
+        `https://dev-vanilla.edviron.com/erp/collect-request/${collectRequestId}`,
+        {
+          params: {
+            school_id: schoolId,
+            sign: sign
+          },
+          headers: {
+            'Authorization': `Bearer ${this.configService.get('API_KEY')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new BadRequestException(`Payment status check failed: ${error.response?.data?.message || error.message}`);
+    }
+  }
+
+  async handlePaymentCallback(query: any) {
+    try {
+      // Handle payment callback from Edviron
+      // This would typically contain payment status information
+      console.log('Payment callback received:', query);
+      
+      // You can process the callback data here
+      // For now, just return a success response
+      return {
+        success: true,
+        message: 'Callback received successfully'
+      };
+    } catch (error) {
+      throw new BadRequestException(`Callback handling failed: ${error.message}`);
     }
   }
 }

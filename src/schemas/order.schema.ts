@@ -31,6 +31,9 @@ export class Order {
 
   @Prop({ unique: true, required: true })
   custom_order_id: string;
+
+  @Prop({ required: false })
+  collect_request_id: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

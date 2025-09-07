@@ -71,7 +71,8 @@ JWT_EXPIRES_IN=24h
 PG_KEY=edvtest01
 API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0cnVzdGVlSWQiOiI2NWIwZTU1MmRkMzE5NTBhOWI0MWM1YmEiLCJJbmRleE9mQXBpS2V5Ijo2LCJpYXQiOjE3MTE2MjIyNzAsImV4cCI6MTc0MzE3OTg3MH0.Rye77Dp59GGxwCmwWekJHRj6edXWJnff9finjMhxKuw
 SCHOOL_ID=65b0e6293e9f76a9694d84b4
-PAYMENT_API_URL=https://api.payment-gateway.com
+PG_KEY=your_pg_secret_key_here
+BASE_URL=http://localhost:3000
 
 # Server Configuration
 PORT=3000
@@ -385,7 +386,8 @@ The API provides comprehensive error handling with:
 - `PG_KEY`: Payment gateway key
 - `API_KEY`: Payment API key
 - `SCHOOL_ID`: School identifier
-- `PAYMENT_API_URL`: Payment gateway URL
+- `PG_KEY`: Payment gateway secret key for JWT signing
+- `BASE_URL`: Base URL for callback endpoints
 
 ### Local Development
 
