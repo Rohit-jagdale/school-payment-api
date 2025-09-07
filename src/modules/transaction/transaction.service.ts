@@ -11,7 +11,7 @@ export class TransactionService {
     @InjectModel(OrderStatus.name) private orderStatusModel: Model<OrderStatusDocument>
   ) {}
 
-  async getAllTransactions(page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc') {
+  async getAllTransactions(page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[]) {
     try {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
@@ -31,6 +31,11 @@ export class TransactionService {
             preserveNullAndEmptyArrays: true
           }
         },
+        ...(status ? [{
+          $match: {
+            'orderStatus.status': Array.isArray(status) ? { $in: status } : status
+          }
+        }] : []),
         {
           $project: {
             collect_id: '$_id',
@@ -81,7 +86,7 @@ export class TransactionService {
     }
   }
 
-  async getTransactionsBySchool(schoolId: string, page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc') {
+  async getTransactionsBySchool(schoolId: string, page: number = 1, limit: number = 10, sortBy: string = 'payment_time', sortOrder: string = 'desc', status?: string | string[]) {
     try {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
@@ -104,6 +109,11 @@ export class TransactionService {
             preserveNullAndEmptyArrays: true
           }
         },
+        ...(status ? [{
+          $match: {
+            'orderStatus.status': Array.isArray(status) ? { $in: status } : status
+          }
+        }] : []),
         {
           $project: {
             collect_id: '$_id',

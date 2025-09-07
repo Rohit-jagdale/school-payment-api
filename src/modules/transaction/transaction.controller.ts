@@ -12,13 +12,15 @@ export class TransactionController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('sortBy') sortBy: string = 'payment_time',
-    @Query('sortOrder') sortOrder: string = 'desc'
+    @Query('sortOrder') sortOrder: string = 'desc',
+    @Query('status') status?: string | string[]
   ) {
     return await this.transactionService.getAllTransactions(
       parseInt(page),
       parseInt(limit),
       sortBy,
-      sortOrder
+      sortOrder,
+      status
     );
   }
 
@@ -28,14 +30,16 @@ export class TransactionController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('sortBy') sortBy: string = 'payment_time',
-    @Query('sortOrder') sortOrder: string = 'desc'
+    @Query('sortOrder') sortOrder: string = 'desc',
+    @Query('status') status?: string | string[]
   ) {
     return await this.transactionService.getTransactionsBySchool(
       schoolId,
       parseInt(page),
       parseInt(limit),
       sortBy,
-      sortOrder
+      sortOrder,
+      status
     );
   }
 
