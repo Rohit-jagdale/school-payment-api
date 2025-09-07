@@ -41,7 +41,7 @@ export class PaymentService {
         payment_details: 'Payment initiated',
         bank_reference: 'N/A',
         payment_message: 'Payment initiated',
-        status: 'pending',
+        status: 'Pending',
         error_message: 'NA'
       });
 
@@ -139,13 +139,13 @@ export class PaymentService {
 
         // Map gateway status to local status
         if (statusResponse.status === 'SUCCESS') {
-          updateData.status = 'completed';
+          updateData.status = 'Success';
         } else if (statusResponse.status === 'FAILED') {
-          updateData.status = 'failed';
+          updateData.status = 'Failed';
         } else if (statusResponse.status === 'PENDING') {
-          updateData.status = 'pending';
+          updateData.status = 'Pending';
         } else {
-          updateData.status = 'pending'; // Default fallback
+          updateData.status = 'Pending'; // Default fallback
         }
 
         // Extract payment details from gateway response
@@ -190,7 +190,7 @@ export class PaymentService {
       
       return {
         order_id: customOrderId,
-        status: orderStatus?.status || 'pending',
+        status: orderStatus?.status || 'Pending',
         payment_details: orderStatus?.payment_details || 'N/A',
         payment_time: orderStatus?.payment_time || null
       };

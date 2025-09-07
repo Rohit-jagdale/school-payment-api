@@ -26,7 +26,7 @@ export class OrderStatus {
   @Prop({ required: true })
   payment_message: string;
 
-  @Prop({ enum: ['pending', 'success', 'failed', 'cancelled', 'completed'], default: 'pending' })
+  @Prop({ enum: ['Pending', 'Success', 'Failed'], default: 'Pending' })
   status: string;
 
   @Prop({ default: 'NA' })

@@ -50,7 +50,7 @@ const orderStatusSchema = new mongoose.Schema({
   payment_details: { type: String, required: true },
   bank_reference: { type: String, required: true },
   payment_message: { type: String, required: true },
-  status: { type: String, enum: ['pending', 'success', 'failed', 'cancelled'], default: 'pending' },
+  status: { type: String, enum: ['Pending', 'Success', 'Failed'], default: 'Pending' },
   error_message: { type: String, default: 'NA' },
   payment_time: { type: Date, default: Date.now }
 }, { timestamps: true });
@@ -193,7 +193,7 @@ app.post('/payment/create-payment', authenticateToken, async (req, res) => {
       payment_details: 'Payment initiated',
       bank_reference: 'N/A',
       payment_message: 'Payment initiated',
-      status: 'pending',
+      status: 'Pending',
       error_message: 'NA'
     });
 
@@ -238,7 +238,7 @@ app.get('/payment/status/:customOrderId', authenticateToken, async (req, res) =>
     
     res.json({
       order_id: customOrderId,
-      status: orderStatus?.status || 'pending',
+      status: orderStatus?.status || 'Pending',
       payment_details: orderStatus?.payment_details || 'N/A',
       payment_time: orderStatus?.payment_time || null
     });
@@ -487,7 +487,7 @@ app.post('/transactions/dummy-data', authenticateToken, async (req, res) => {
         payment_details: 'success@ybl',
         bank_reference: 'YESBNK222',
         payment_message: 'payment success',
-        status: 'success',
+        status: 'Success',
         error_message: 'NA',
         payment_time: new Date()
       },
@@ -499,7 +499,7 @@ app.post('/transactions/dummy-data', authenticateToken, async (req, res) => {
         payment_details: 'Card ending in 1234',
         bank_reference: 'HDFC123',
         payment_message: 'payment success',
-        status: 'success',
+        status: 'Success',
         error_message: 'NA',
         payment_time: new Date()
       }

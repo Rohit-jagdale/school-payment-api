@@ -245,7 +245,7 @@ export class TransactionService {
           payment_details: 'success@ybl',
           bank_reference: 'YESBNK222',
           payment_message: 'payment success',
-          status: 'success',
+          status: 'Success',
           error_message: 'NA',
           payment_time: new Date()
         },
@@ -257,7 +257,7 @@ export class TransactionService {
           payment_details: 'Card ending in 1234',
           bank_reference: 'HDFC123',
           payment_message: 'payment success',
-          status: 'success',
+          status: 'Success',
           error_message: 'NA',
           payment_time: new Date()
         }
