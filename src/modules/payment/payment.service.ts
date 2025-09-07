@@ -133,16 +133,47 @@ export class PaymentService {
         );
 
         // Update local order status based on gateway response
+        const updateData: any = {
+          payment_time: new Date()
+        };
+
+        // Map gateway status to local status
         if (statusResponse.status === 'SUCCESS') {
-          await this.orderStatusModel.findOneAndUpdate(
-            { collect_id: order._id },
-            {
-              status: 'completed',
-              payment_details: 'Payment completed successfully',
-              payment_time: new Date()
-            }
-          );
+          updateData.status = 'completed';
+        } else if (statusResponse.status === 'FAILED') {
+          updateData.status = 'failed';
+        } else if (statusResponse.status === 'PENDING') {
+          updateData.status = 'pending';
+        } else {
+          updateData.status = 'pending'; // Default fallback
         }
+
+        // Extract payment details from gateway response
+        if (statusResponse.details) {
+          updateData.payment_mode = statusResponse.details.payment_mode || 'unknown';
+          updateData.bank_reference = statusResponse.details.bank_ref || 'N/A';
+          
+          // Create detailed payment message
+          let paymentMessage = `Payment ${updateData.status}`;
+          if (statusResponse.details.payment_methods?.card) {
+            const card = statusResponse.details.payment_methods.card;
+            paymentMessage = `Payment via ${card.card_type} (${card.card_network}) - ${card.card_bank_name}`;
+          }
+          updateData.payment_message = paymentMessage;
+          
+          // Create detailed payment details
+          let paymentDetails = `Payment ${updateData.status}`;
+          if (statusResponse.details.payment_methods?.card) {
+            const card = statusResponse.details.payment_methods.card;
+            paymentDetails = `Card ending in ${card.card_number.slice(-4)} - ${card.card_bank_name}`;
+          }
+          updateData.payment_details = paymentDetails;
+        }
+
+        await this.orderStatusModel.findOneAndUpdate(
+          { collect_id: order._id },
+          updateData
+        );
 
         return {
           order_id: customOrderId,
