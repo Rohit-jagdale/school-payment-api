@@ -5,9 +5,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS to allow all origins
+  // Enable CORS with specific configuration
   app.enableCors({
-    origin: true, // Allow all origins
+    origin: [
+      'http://localhost:5173', // Vite dev server
+      'http://localhost:3000', // Alternative dev server
+      'http://127.0.0.1:5173', // Alternative localhost
+      'http://127.0.0.1:3000', // Alternative localhost
+      'https://school-payment-frontend-epmi.vercel.app',// Add your production frontend URL here when deployed
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true,
