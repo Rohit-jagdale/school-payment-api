@@ -13,6 +13,7 @@ async function bootstrap() {
       'http://127.0.0.1:5173', // Alternative localhost
       'http://127.0.0.1:3000', // Alternative localhost
       'https://school-payment-frontend-epmi.vercel.app',// Add your production frontend URL here when deployed
+      'https://school-payment-frontend-epmi-18glznvl6-rohits-projects-e6c08023.vercel.app',// Add your production frontend URL here when deployed
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
