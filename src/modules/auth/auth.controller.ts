@@ -14,7 +14,7 @@ export class AuthController {
     try {
       this.logger.log(`Registration request received for email: ${registerDto.email}`);
       const result = await this.authService.create(registerDto);
-      this.logger.log(`Registration successful for user: ${result.id || result._id}`);
+      this.logger.log(`Registration successful for user: ${(result as any)._id}`);
       return result;
     } catch (error) {
       this.logger.error(`Registration failed for email: ${registerDto.email}`, error.stack);
