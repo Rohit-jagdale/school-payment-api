@@ -5,9 +5,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS - allow all origins for production
+  // Enable CORS - allow specific frontend origins
   app.enableCors({
-    origin: true, // Allow all origins
+    origin: [
+      'https://school-payment-frontend-six.vercel.app',
+      'https://school-payment-frontend-git-main-rohits-projects-e6c08023.vercel.app',
+      'https://school-payment-frontend-ec765y7rz-rohits-projects-e6c08023.vercel.app',
+      'http://localhost:3000', // For local development
+      'http://localhost:5173', // For Vite dev server
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: true,
