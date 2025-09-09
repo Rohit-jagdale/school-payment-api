@@ -51,13 +51,9 @@ cd school-payment-api
 pnpm install
 ```
 
-3. Set up environment variables:
 
-```bash
-cp .env.example .env
-```
 
-4. Update the `.env` file with your configuration:
+3. Update the `.env` file with your configuration:
 
 ```env
 # Database Configuration
@@ -79,7 +75,7 @@ PORT=3000
 NODE_ENV=development
 ```
 
-5. Start the development server:
+4. Start the development server:
 
 ```bash
 pnpm run start:dev
@@ -386,7 +382,6 @@ The API provides comprehensive error handling with:
 - `PG_KEY`: Payment gateway key
 - `API_KEY`: Payment API key
 - `SCHOOL_ID`: School identifier
-- `PG_KEY`: Payment gateway secret key for JWT signing
 - `BASE_URL`: Base URL for callback endpoints
 
 ### Local Development
@@ -396,7 +391,6 @@ The API provides comprehensive error handling with:
 pnpm install
 
 # Set up environment variables
-cp .env.example .env
 
 # Start development server
 pnpm start:dev

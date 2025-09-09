@@ -19,13 +19,11 @@ export class AuthService {
 
     this.logger.log(`Registration attempt for email: ${email}, username: ${username}`);
 
-    // Validate input
     if (!email || !username || !password) {
       this.logger.warn('Registration failed: Missing required fields');
       throw new BadRequestException('Email, username, and password are required');
     }
-
-    // Check if user already exists
+    
     const existingUser = await this.userModel.findOne({
       $or: [{ email }, { username }]
     });
@@ -40,10 +38,8 @@ export class AuthService {
       }
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = new this.userModel({
       email,
       username,

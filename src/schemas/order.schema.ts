@@ -38,7 +38,7 @@ export class Order {
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-// Create indexes for better performance
+
 OrderSchema.index({ school_id: 1 });
 OrderSchema.index({ custom_order_id: 1 });
 OrderSchema.index({ trustee_id: 1 });

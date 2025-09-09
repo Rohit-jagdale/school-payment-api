@@ -23,7 +23,6 @@ export class WebhookLogs {
 
 export const WebhookLogsSchema = SchemaFactory.createForClass(WebhookLogs);
 
-// Create indexes for better performance
 WebhookLogsSchema.index({ order_id: 1 });
 WebhookLogsSchema.index({ status: 1 });
 WebhookLogsSchema.index({ processed_at: -1 });

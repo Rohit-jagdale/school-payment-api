@@ -38,7 +38,7 @@ export class OrderStatus {
 
 export const OrderStatusSchema = SchemaFactory.createForClass(OrderStatus);
 
-// Create indexes for better performance
+
 OrderStatusSchema.index({ collect_id: 1 });
 OrderStatusSchema.index({ status: 1 });
 OrderStatusSchema.index({ payment_time: -1 });

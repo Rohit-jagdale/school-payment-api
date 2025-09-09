@@ -16,7 +16,7 @@ export class TransactionService {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
 
-      // Build date filter
+     
       const dateFilter: any = {};
       if (dateFrom || dateTo) {
         const paymentTimeFilter: any = { $exists: true, $ne: null };
@@ -36,7 +36,7 @@ export class TransactionService {
       }
 
       const pipeline: any[] = [
-        // Add search filter at the beginning if search is provided
+       
         ...(search ? [{
           $match: {
             school_id: { $regex: search, $options: 'i' }
@@ -119,7 +119,7 @@ export class TransactionService {
       const skip = (page - 1) * limit;
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
 
-      // Build date filter
+     
       const dateFilter: any = {};
       if (dateFrom || dateTo) {
         const paymentTimeFilter: any = { $exists: true, $ne: null };
@@ -270,7 +270,7 @@ export class TransactionService {
 
   async createDummyData() {
     try {
-      // Create dummy orders
+      
       const dummyOrders = [
         {
           school_id: '65b0e6293e9f76a9694d84b4',
@@ -298,7 +298,7 @@ export class TransactionService {
 
       const createdOrders = await this.orderModel.insertMany(dummyOrders);
 
-      // Create dummy order statuses
+        
       const dummyOrderStatuses = [
         {
           collect_id: createdOrders[0]._id,

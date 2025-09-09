@@ -15,7 +15,7 @@ export class WebhookService {
 
   async processWebhook(webhookData: any) {
     try {
-      // Log webhook payload
+      
       const webhookLog = new this.webhookLogsModel({
         order_id: webhookData.order_info.order_id,
         webhook_payload: webhookData,
@@ -24,7 +24,7 @@ export class WebhookService {
 
       await webhookLog.save();
 
-      // Find the order by custom_order_id
+      
       const order = await this.orderModel.findOne({ 
         custom_order_id: webhookData.order_info.order_id 
       });
@@ -36,7 +36,7 @@ export class WebhookService {
         throw new BadRequestException('Order not found');
       }
 
-      // Update order status
+      
       const orderStatus = await this.orderStatusModel.findOne({ 
         collect_id: order._id 
       });
@@ -54,7 +54,7 @@ export class WebhookService {
 
         await orderStatus.save();
       } else {
-        // Create new order status if it doesn't exist
+        
         const newOrderStatus = new this.orderStatusModel({
           collect_id: order._id,
           order_amount: webhookData.order_info.order_amount,
@@ -71,7 +71,7 @@ export class WebhookService {
         await newOrderStatus.save();
       }
 
-      // Update webhook log status
+      
       webhookLog.status = 'processed';
       await webhookLog.save();
 
@@ -82,7 +82,6 @@ export class WebhookService {
       };
 
     } catch (error) {
-      // Log error
       const webhookLog = await this.webhookLogsModel.findOne({ 
         order_id: webhookData.order_info.order_id 
       });

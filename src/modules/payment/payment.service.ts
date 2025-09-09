@@ -18,10 +18,8 @@ export class PaymentService {
 
   async createPayment(createPaymentDto: any, user: any) {
     try {
-      // Generate custom order ID if not provided
       const customOrderId = createPaymentDto.custom_order_id || `ORDER_${Date.now()}_${uuidv4().substring(0, 8)}`;
 
-      // Create order in database
       const order = new this.orderModel({
         school_id: createPaymentDto.school_id,
         trustee_id: createPaymentDto.trustee_id,
@@ -32,7 +30,6 @@ export class PaymentService {
 
       const savedOrder = await order.save();
 
-      // Create order status entry
       const orderStatus = new this.orderStatusModel({
         collect_id: savedOrder._id,
         order_amount: createPaymentDto.order_amount,
@@ -47,7 +44,6 @@ export class PaymentService {
 
       await orderStatus.save();
 
-      // Prepare Edviron API payload according to documentation
       const callbackUrl = `${this.configService.get('BASE_URL') || 'http://localhost:3000'}/payment/callback`;
       
       const jwtPayload = {
@@ -56,7 +52,6 @@ export class PaymentService {
         callback_url: callbackUrl
       };
 
-      // Generate JWT token using PG secret key for signing
       const sign = jwt.sign(jwtPayload, this.configService.get('PG_KEY'), {
         expiresIn: '1h'
       });
@@ -68,10 +63,8 @@ export class PaymentService {
         sign: sign
       };
 
-      // Call Edviron payment gateway API
       const paymentResponse = await this.callPaymentGateway(paymentPayload);
 
-      // Update order with collect_request_id
       await this.orderModel.findByIdAndUpdate(savedOrder._id, {
         collect_request_id: paymentResponse.collect_request_id
       });
@@ -115,7 +108,7 @@ export class PaymentService {
         throw new BadRequestException('Order not found');
       }
 
-      // If we have a collect_request_id, check status with Edviron API
+    
       if (order.collect_request_id) {
         const jwtPayload = {
           school_id: order.school_id.toString(),
@@ -132,12 +125,10 @@ export class PaymentService {
           sign
         );
 
-        // Update local order status based on gateway response
         const updateData: any = {
           payment_time: new Date()
         };
 
-        // Map gateway status to local status
         if (statusResponse.status === 'SUCCESS') {
           updateData.status = 'Success';
         } else if (statusResponse.status === 'FAILED') {
@@ -145,15 +136,13 @@ export class PaymentService {
         } else if (statusResponse.status === 'PENDING') {
           updateData.status = 'Pending';
         } else {
-          updateData.status = 'Pending'; // Default fallback
+          updateData.status = 'Pending';
         }
 
-        // Extract payment details from gateway response
         if (statusResponse.details) {
           updateData.payment_mode = statusResponse.details.payment_mode || 'unknown';
           updateData.bank_reference = statusResponse.details.bank_ref || 'N/A';
           
-          // Create detailed payment message
           let paymentMessage = `Payment ${updateData.status}`;
           if (statusResponse.details.payment_methods?.card) {
             const card = statusResponse.details.payment_methods.card;
@@ -161,7 +150,6 @@ export class PaymentService {
           }
           updateData.payment_message = paymentMessage;
           
-          // Create detailed payment details
           let paymentDetails = `Payment ${updateData.status}`;
           if (statusResponse.details.payment_methods?.card) {
             const card = statusResponse.details.payment_methods.card;
@@ -185,7 +173,6 @@ export class PaymentService {
         };
       }
 
-      // Fallback to local status if no collect_request_id
       const orderStatus = await this.orderStatusModel.findOne({ collect_id: order._id });
       
       return {
@@ -223,12 +210,8 @@ export class PaymentService {
 
   async handlePaymentCallback(query: any) {
     try {
-      // Handle payment callback from Edviron
-      // This would typically contain payment status information
       console.log('Payment callback received:', query);
       
-      // You can process the callback data here
-      // For now, just return a success response
       return {
         success: true,
         message: 'Callback received successfully'
